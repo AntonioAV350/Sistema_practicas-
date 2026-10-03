@@ -43,6 +43,10 @@ async function main() {
       }
     }
     console.log(nuevas === 0 ? 'Base de datos al día.' : `Listo: ${nuevas} migración(es) aplicada(s).`);
+        if (process.argv.includes('--seed')) {
+          await client.query(fs.readFileSync(path.join(__dirname, 'seed.sql'), 'utf8'));
+      console.log('Seed aplicado.');
+      }
   } finally {
     await client.end();
   }
