@@ -2,16 +2,13 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { Client } = require('pg');
+require('dotenv').config({ path: path.join(__dirname, '../../.env'), quiet: true });
 
 const MIGRATIONS_DIR = path.join(__dirname, 'migrations');
 
 async function main() {
-  if (!process.env.DATABASE_URL) {
-    console.error('Falta la variable de entorno DATABASE_URL');
-    process.exit(1);
-  }
   const files = fs.readdirSync(MIGRATIONS_DIR).filter((f) => /^\d+_.+\.sql$/.test(f)).sort();
-  const client = new Client({ connectionString: process.env.DATABASE_URL });
+  const client = new Client(process.env.DATABASE_URL ? { connectionString: process.env.DATABASE_URL } : {});
   await client.connect();
   try {
     await client.query(`
