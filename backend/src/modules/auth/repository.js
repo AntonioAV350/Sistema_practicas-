@@ -1,5 +1,6 @@
-const pool = require('../../config/db');
 
+const pool = require('../../config/db');
+ 
 // Columnas que se devuelven siempre.
 // password_hash solamente se devuelve en getUserByEmail()
 // porque el login necesita comprobar la contraseña.
@@ -14,7 +15,7 @@ const COLUMNAS = `
   u.activo,
   u.fecha_creacion
 `;
-
+ 
 // Roles y subroles del usuario.
 const ROLES = `
   COALESCE(
@@ -35,7 +36,7 @@ const ROLES = `
     '[]'::json
   ) AS roles
 `;
-
+ 
 // Lista blanca de campos que se pueden modificar.
 // Evita insertar nombres de columnas directamente desde el usuario.
 const EDITABLES = {
@@ -48,11 +49,8 @@ const EDITABLES = {
   telefono: 'telefono',
   activo: 'activo',
 };
-
-// ============================================================
-// CREATE
-// ============================================================
-
+ 
+// Crear un usuario nuevo, devuelve el usuario creado con todos sus datos y roles.
 async function createUser({
   username,
   email,
@@ -63,8 +61,7 @@ async function createUser({
   telefono = null,
 }) {
   const { rows } = await pool.query(
-    `
-      INSERT INTO core.usuarios
+    `INSERT INTO core.usuarios
         (
           username,
           email,
@@ -75,8 +72,7 @@ async function createUser({
           telefono
         )
       VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING id_usuario
-    `,
+      RETURNING id_usuario`,
     [
       username,
       email,
@@ -87,111 +83,85 @@ async function createUser({
       telefono,
     ],
   );
-
+ 
   return getUserById(rows[0].id_usuario);
 }
-
-// ============================================================
-// READ: por email
-// ============================================================
-
+ 
+//capturar y obtener datos por email
+ 
 async function getUserByEmail(email) {
   const { rows } = await pool.query(
-    `
-      SELECT
-        ${COLUMNAS},
-        u.password_hash,
-        ${ROLES}
-      FROM core.usuarios u
-      WHERE lower(u.email) = lower($1)
-    `,
-    [email],
+    `SELECT ${COLUMNAS}, u.password_hash,
+     ${ROLES} FROM core.usuarios u WHERE lower(u.email) = lower($1)`, [email],
   );
-
+ 
   return rows[0] || null;
 }
-
-// ============================================================
-// READ: por ID
-// ============================================================
-
+ 
+// capturar y obtener datos por id
+ 
 async function getUserById(id) {
   const { rows } = await pool.query(
-    `
-      SELECT
-        ${COLUMNAS},
-        ${ROLES}
-      FROM core.usuarios u
-      WHERE u.id_usuario = $1
-    `,
-    [id],
-  );
-
+    ` SELECT ${COLUMNAS},
+        ${ROLES} FROM core.usuarios u WHERE u.id_usuario = $1`,[id],
+);
+ 
   return rows[0] || null;
 }
-
-// ============================================================
-// UPDATE
-// ============================================================
+// para actualizar un usuario, se pasan los campos a modificar en un objeto
 
 async function updateUser(id, campos = {}) {
   const sets = [];
   const valores = [];
-
+ 
   for (const [clave, columna] of Object.entries(EDITABLES)) {
     if (campos[clave] !== undefined) {
       valores.push(campos[clave]);
       sets.push(`${columna} = $${valores.length}`);
     }
   }
-
-  // Si no mandaron campos para modificar,
-  // simplemente devolvemos el usuario actual.
   if (sets.length === 0) {
     return getUserById(id);
   }
-
+ 
   valores.push(id);
-
+ 
   const { rows } = await pool.query(
-    `
-      UPDATE core.usuarios
-      SET ${sets.join(', ')}
-      WHERE id_usuario = $${valores.length}
-      RETURNING id_usuario
-    `,
-    valores,
+    `UPDATE core.usuarios SET ${sets.join(', ')} WHERE id_usuario = $${valores.length} RETURNING id_usuario`,valores,
   );
-
+ 
   return rows[0]
     ? getUserById(rows[0].id_usuario)
     : null;
 }
-
-// ============================================================
-// DEACTIVATE
-// ============================================================
 
 async function deactivateUser(id) {
   const { rows } = await pool.query(
-    `
-      UPDATE core.usuarios
-      SET activo = FALSE
-      WHERE id_usuario = $1
-      RETURNING id_usuario
-    `,
-    [id],
+    `UPDATE core.usuarios SET activo = FALSE WHERE id_usuario = $1 RETURNING id_usuario`, [id],
   );
-
+ 
   return rows[0]
     ? getUserById(rows[0].id_usuario)
     : null;
 }
-
-module.exports = {
-  createUser,
-  getUserByEmail,
-  getUserById,
-  updateUser,
-  deactivateUser,
-};
+ 
+async function assignRole(idUsuario, claveRol, claveSubrol = null, asignadoPor = null) {
+  const { rows } = await pool.query(
+    `INSERT INTO core.usuario_roles (id_usuario, id_rol, id_subrol, asignado_por)
+     SELECT $1, r.id_rol, s.id_subrol, $4
+     FROM core.roles r
+     LEFT JOIN core.subroles s ON s.clave = $3 AND s.id_rol = r.id_rol
+     WHERE r.clave = $2
+       AND ($3::text IS NULL OR s.id_subrol IS NOT NULL)
+     RETURNING id_usuario`,
+    [idUsuario, claveRol, claveSubrol, asignadoPor],
+  );
+  if (!rows[0]) throw new Error(
+    claveSubrol
+      ? `El rol ${claveRol} con subrol ${claveSubrol} no existe`
+      : `El rol ${claveRol} no existe`,
+  );
+  return getUserById(idUsuario);
+}
+ 
+module.exports = { createUser, getUserByEmail, getUserById, updateUser, deactivateUser, assignRole };
