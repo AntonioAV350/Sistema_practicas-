@@ -114,3 +114,31 @@ SET
 
 -- Si el ofertador quiere reportar otra cosa, usa incidencias.categoria_libre.
 -- Categorías nuevas: solo un INSERT más aquí.
+
+-- ============================================================
+-- USUARIOS DE PRUEBA (SOLO DESARROLLO)
+-- ============================================================
+-- Uno por rol/subrol. Todos usan la contraseña "SigeaDev2026!"
+-- (hash bcrypt, costo 10). Ver README. No correr este seed en producción.
+INSERT INTO core.usuarios (username, email, password_hash, nombre, apellido_paterno) VALUES
+    ('estudiante.prueba',  'estudiante@sigea.test',  '$2b$10$ndIBIIEs7NHY6.cJyu3SoOB1Ha605WCYXLm6Vvi7cBC732KUB3/fy', 'Estudiante', 'Prueba'),
+    ('ofertador.prueba',   'ofertador@sigea.test',   '$2b$10$ndIBIIEs7NHY6.cJyu3SoOB1Ha605WCYXLm6Vvi7cBC732KUB3/fy', 'Ofertador', 'Prueba'),
+    ('academico.prueba',   'academico@sigea.test',   '$2b$10$ndIBIIEs7NHY6.cJyu3SoOB1Ha605WCYXLm6Vvi7cBC732KUB3/fy', 'Admin Académico', 'Prueba'),
+    ('documental.prueba',  'documental@sigea.test',  '$2b$10$ndIBIIEs7NHY6.cJyu3SoOB1Ha605WCYXLm6Vvi7cBC732KUB3/fy', 'Admin Documental', 'Prueba'),
+    ('superadmin.prueba',  'superadmin@sigea.test',  '$2b$10$ndIBIIEs7NHY6.cJyu3SoOB1Ha605WCYXLm6Vvi7cBC732KUB3/fy', 'Superadmin', 'Prueba')
+ON CONFLICT (username) DO NOTHING;
+
+-- ADMIN siempre lleva subrol (lo exige trg_exigir_subrol)
+INSERT INTO core.usuario_roles (id_usuario, id_rol, id_subrol)
+SELECT u.id_usuario, r.id_rol, s.id_subrol
+FROM (VALUES
+    ('estudiante.prueba', 'ESTUDIANTE', NULL),
+    ('ofertador.prueba',  'OFERTADOR',  NULL),
+    ('academico.prueba',  'ADMIN',      'ADMIN_ACADEMICO'),
+    ('documental.prueba', 'ADMIN',      'ADMIN_DOCUMENTAL'),
+    ('superadmin.prueba', 'SUPERADMIN', NULL)
+) AS x(username, rol, subrol)
+JOIN core.usuarios u ON u.username = x.username
+JOIN core.roles r ON r.clave = x.rol
+LEFT JOIN core.subroles s ON s.clave = x.subrol
+ON CONFLICT (id_usuario, id_rol) DO NOTHING;
