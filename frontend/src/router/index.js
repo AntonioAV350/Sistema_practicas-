@@ -8,22 +8,30 @@ const { ADMIN_ACADEMICO: ACA, ADMIN_DOCUMENTAL: DOC } = SUBROLES;
 const v = {
   inicio: () => import('../views/comun/InicioView.vue'),
   notificaciones: () => import('../views/comun/NotificacionesView.vue'),
+  // admin
+  alumnos: () => import('../views/admin/AlumnosView.vue'),
+  alumnoDetalle: () => import('../views/admin/AlumnoDetalleView.vue'),
 };
 
 // Vistas de administración que también usa el superadmin (tiene todo lo del admin)
 function vistasAdmin() {
-  return [];
+  return [
+    { path: 'alumnos', component: v.alumnos, meta: { titulo: 'Alumnos' } },
+    { path: 'alumnos/:id', component: v.alumnoDetalle, meta: { titulo: 'Detalle del alumno' } },
+  ];
 }
 
 const routes = [
   { path: '/', redirect: '/login' },
   { path: '/login', name: 'login', component: () => import('../views/auth/LoginView.vue') },
+  { path: '/registro', name: 'registro', component: () => import('../views/auth/RegistroView.vue') },
   {
     path: '/alumno',
     component: () => import('../layouts/AlumnoLayout.vue'),
     meta: { requiresAuth: true, roles: [ESTUDIANTE] },
     children: [
       { path: '', component: v.inicio, meta: { titulo: 'Inicio' } },
+      { path: 'datos', component: () => import('../views/alumno/MisDatosView.vue'), meta: { titulo: 'Mis datos' } },
       { path: 'notificaciones', component: v.notificaciones, meta: { titulo: 'Notificaciones' } },
     ],
   },
@@ -52,6 +60,8 @@ const routes = [
     meta: { requiresAuth: true, roles: [SUPERADMIN] },
     children: [
       { path: '', component: v.inicio, meta: { titulo: 'Inicio' } },
+      { path: 'cuentas', component: () => import('../views/superadmin/CuentasView.vue'), meta: { titulo: 'Cuentas' } },
+      { path: 'empresas', component: () => import('../views/superadmin/EmpresasView.vue'), meta: { titulo: 'Empresas' } },
       ...vistasAdmin(),
       { path: 'notificaciones', component: v.notificaciones, meta: { titulo: 'Notificaciones' } },
     ],

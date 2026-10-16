@@ -51,4 +51,25 @@ async function refresh(userId) {
   return { token: generateToken(user), user: toPublicUser(user) };
 }
 
-module.exports = { login, refresh, AuthError };
+// Alta del alumno + sesión iniciada (el registro lo hace el módulo alumnos)
+async function registro(datos) {
+  const alumnos = require('../alumnos/service');
+  const user = await alumnos.registrar(datos);
+  return { token: generateToken(user), user: toPublicUser(user) };
+}
+
+async function me(userId) {
+  const user = await repository.getUserById(userId);
+  if (!user || !user.activo) throw new AuthError(401, 'TOKEN_INVALID', 'La sesión ya no es válida');
+  return toPublicUser(user);
+}
+
+async function cambiarPassword(userId, actual, nueva) {
+  const hash = await repository.getPasswordHash(userId);
+  if (!hash || !(await bcrypt.compare(actual, hash))) {
+    throw new AuthError(400, 'PASSWORD_INCORRECTA', 'La contraseña actual no es correcta');
+  }
+  await repository.setPassword(userId, await bcrypt.hash(nueva, 10));
+}
+
+module.exports = { login, refresh, registro, me, cambiarPassword, AuthError };

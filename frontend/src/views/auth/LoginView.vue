@@ -119,9 +119,12 @@ async function onSubmit() {
           </div>
 
           <div class="text-right -mt-2">
-            <RouterLink to="/recuperar" class="text-sm font-medium text-[#0b3a63] hover:underline">
+            <span
+              v-tooltip.bottom="'Pide a la coordinación de prácticas que restablezca tu contraseña.'"
+              class="text-sm font-medium text-[#0b3a63] cursor-help"
+            >
               ¿Olvidaste tu contraseña?
-            </RouterLink>
+            </span>
           </div>
 
           <Button

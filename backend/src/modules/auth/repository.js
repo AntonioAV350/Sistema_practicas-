@@ -59,8 +59,8 @@ async function createUser({
   apellidoPaterno,
   apellidoMaterno = null,
   telefono = null,
-}) {
-  const { rows } = await pool.query(
+}, db = pool) {
+  const { rows } = await db.query(
     `INSERT INTO core.usuarios
         (
           username,
@@ -84,9 +84,9 @@ async function createUser({
     ],
   );
  
-  return getUserById(rows[0].id_usuario);
+  return getUserById(rows[0].id_usuario, db);
 }
- 
+
 //capturar y obtener datos por email
  
 async function getUserByEmail(email) {
@@ -100,8 +100,8 @@ async function getUserByEmail(email) {
  
 // capturar y obtener datos por id
  
-async function getUserById(id) {
-  const { rows } = await pool.query(
+async function getUserById(id, db = pool) {
+  const { rows } = await db.query(
     ` SELECT ${COLUMNAS},
         ${ROLES} FROM core.usuarios u WHERE u.id_usuario = $1`,[id],
 );
@@ -110,10 +110,10 @@ async function getUserById(id) {
 }
 // para actualizar un usuario, se pasan los campos a modificar en un objeto
 
-async function updateUser(id, campos = {}) {
+async function updateUser(id, campos = {}, db = pool) {
   const sets = [];
   const valores = [];
- 
+
   for (const [clave, columna] of Object.entries(EDITABLES)) {
     if (campos[clave] !== undefined) {
       valores.push(campos[clave]);
@@ -121,17 +121,17 @@ async function updateUser(id, campos = {}) {
     }
   }
   if (sets.length === 0) {
-    return getUserById(id);
+    return getUserById(id, db);
   }
- 
+
   valores.push(id);
- 
-  const { rows } = await pool.query(
+
+  const { rows } = await db.query(
     `UPDATE core.usuarios SET ${sets.join(', ')} WHERE id_usuario = $${valores.length} RETURNING id_usuario`,valores,
   );
- 
+
   return rows[0]
-    ? getUserById(rows[0].id_usuario)
+    ? getUserById(rows[0].id_usuario, db)
     : null;
 }
 
@@ -145,8 +145,8 @@ async function deactivateUser(id) {
     : null;
 }
  
-async function assignRole(idUsuario, claveRol, claveSubrol = null, asignadoPor = null) {
-  const { rows } = await pool.query(
+async function assignRole(idUsuario, claveRol, claveSubrol = null, asignadoPor = null, db = pool) {
+  const { rows } = await db.query(
     `INSERT INTO core.usuario_roles (id_usuario, id_rol, id_subrol, asignado_por)
      SELECT $1, r.id_rol, s.id_subrol, $4
      FROM core.roles r
@@ -161,7 +161,44 @@ async function assignRole(idUsuario, claveRol, claveSubrol = null, asignadoPor =
       ? `El rol ${claveRol} con subrol ${claveSubrol} no existe`
       : `El rol ${claveRol} no existe`,
   );
-  return getUserById(idUsuario);
+  return getUserById(idUsuario, db);
 }
  
 module.exports = { createUser, getUserByEmail, getUserById, updateUser, deactivateUser, assignRole };
+// --- Usados por registro, cambio de contraseña y cuentas ---
+
+async function getPasswordHash(id) {
+  const { rows } = await pool.query('SELECT password_hash FROM core.usuarios WHERE id_usuario = $1', [id]);
+  return rows[0]?.password_hash ?? null;
+}
+
+async function emailEnUso(email, exceptoId = null, db = pool) {
+  const { rows } = await db.query(
+    'SELECT 1 FROM core.usuarios WHERE lower(email) = lower($1) AND ($2::bigint IS NULL OR id_usuario <> $2)',
+    [email, exceptoId],
+  );
+  return rows.length > 0;
+}
+
+// username a partir de una base (parte local del correo o matrícula), sin repetir
+async function usernameDisponible(base, db = pool) {
+  const limpio = base.toLowerCase().replace(/[^a-z0-9._-]/g, '').slice(0, 40) || 'usuario';
+  const { rows } = await db.query(
+    `SELECT username FROM core.usuarios WHERE username = $1 OR username LIKE $1 || '.%'`,
+    [limpio],
+  );
+  const usados = new Set(rows.map((r) => r.username));
+  if (!usados.has(limpio)) return limpio;
+  let n = 2;
+  while (usados.has(`${limpio}.${n}`)) n += 1;
+  return `${limpio}.${n}`;
+}
+
+async function setPassword(id, passwordHash, db = pool) {
+  await db.query('UPDATE core.usuarios SET password_hash = $1 WHERE id_usuario = $2', [passwordHash, id]);
+}
+
+module.exports.getPasswordHash = getPasswordHash;
+module.exports.emailEnUso = emailEnUso;
+module.exports.usernameDisponible = usernameDisponible;
+module.exports.setPassword = setPassword;
