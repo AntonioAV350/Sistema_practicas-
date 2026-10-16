@@ -4,7 +4,12 @@ const INSTITUCION = process.env.INSTITUCION_NOMBRE || 'Universidad Autónoma de 
 const AZUL = rgb(0.043, 0.227, 0.388); // #0b3a63, el mismo del login
 
 // Las fuentes estándar de pdf-lib usan WinAnsi: quita lo que no se pueda dibujar.
-const limpiar = (t) => String(t ?? '').replace(/[^\x20-\x7E -ÿ\n]/g, '');
+const limpiar = (t) =>
+  String(t ?? '')
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/[–—]/g, '-')
+    .replace(/[^\x20-\x7E -ÿ\n]/g, '');
 
 function partirLineas(texto, fuente, tamano, ancho) {
   const lineas = [];

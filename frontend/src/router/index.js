@@ -18,6 +18,11 @@ function vistasAdmin() {
   return [
     { path: 'alumnos', component: v.alumnos, meta: { titulo: 'Alumnos' } },
     { path: 'alumnos/:id', component: v.alumnoDetalle, meta: { titulo: 'Detalle del alumno' } },
+    {
+      path: 'cartas',
+      component: () => import('../views/admin/CartasView.vue'),
+      meta: { titulo: 'Cartas de presentación', subroles: [DOC] },
+    },
   ];
 }
 
@@ -32,6 +37,7 @@ const routes = [
     children: [
       { path: '', component: v.inicio, meta: { titulo: 'Inicio' } },
       { path: 'datos', component: () => import('../views/alumno/MisDatosView.vue'), meta: { titulo: 'Mis datos' } },
+      { path: 'carta', component: () => import('../views/alumno/CartaView.vue'), meta: { titulo: 'Carta de presentación' } },
       { path: 'notificaciones', component: v.notificaciones, meta: { titulo: 'Notificaciones' } },
     ],
   },
