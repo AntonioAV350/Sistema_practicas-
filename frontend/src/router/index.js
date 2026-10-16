@@ -31,6 +31,12 @@ function vistasAdmin() {
     { path: 'practicas', component: v.practicas, meta: { titulo: 'Prácticas' } },
     { path: 'practicas/:id', component: v.practicaDetalle, meta: { titulo: 'Detalle de la práctica' } },
     { path: 'cierres', component: v.practicas, meta: { titulo: 'Cierres', soloCierres: true, subroles: [ACA] } },
+    {
+      path: 'incidencias',
+      component: () => import('../views/admin/IncidenciasView.vue'),
+      meta: { titulo: 'Incidencias', subroles: [ACA] },
+    },
+    { path: 'bajas', component: () => import('../views/admin/BajasView.vue'), meta: { titulo: 'Bajas', subroles: [ACA] } },
   ];
 }
 
@@ -70,6 +76,11 @@ const routes = [
         meta: { titulo: 'Mis practicantes' },
       },
       { path: 'practicantes/:id', component: v.practicaDetalle, meta: { titulo: 'Practicante' } },
+      {
+        path: 'incidencias',
+        component: () => import('../views/ofertador/ReportesView.vue'),
+        meta: { titulo: 'Incidencias y bajas' },
+      },
       { path: 'notificaciones', component: v.notificaciones, meta: { titulo: 'Notificaciones' } },
     ],
   },

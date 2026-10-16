@@ -12,6 +12,7 @@ import Message from 'primevue/message';
 import PracticaResumen from './PracticaResumen.vue';
 import BitacoraPanel from './BitacoraPanel.vue';
 import TareasPanel from './TareasPanel.vue';
+import ReportesPractica from './ReportesPractica.vue';
 import * as api from '../services/practicas';
 import * as cartas from '../services/cartas';
 import { useAviso } from '../composables/useAviso';
@@ -164,7 +165,15 @@ onMounted(cargarTareas);
           :loading="trabajando"
           @click="proyectoCompletado"
         />
-        <slot name="acciones-ofertador" />
+        <Button
+          v-if="['ACTIVA', 'EN_REVISION_CIERRE'].includes(p.estado)"
+          label="Incidencias y bajas"
+          icon="pi pi-exclamation-circle"
+          size="small"
+          severity="warn"
+          text
+          @click="pestana = 'reportes'"
+        />
       </template>
 
       <template v-if="rol === 'ADMIN'">
@@ -183,7 +192,7 @@ onMounted(cargarTareas);
         <TabList>
           <Tab value="bitacora">Bitácora</Tab>
           <Tab value="tareas">Tareas ({{ tareas.length }})</Tab>
-          <slot name="pestanas" />
+          <Tab v-if="rol !== 'ALUMNO'" value="reportes">Incidencias y bajas</Tab>
         </TabList>
         <TabPanels>
           <TabPanel value="bitacora">
@@ -192,7 +201,9 @@ onMounted(cargarTareas);
           <TabPanel value="tareas">
             <TareasPanel :practica="p" :tareas="tareas" :rol="rol" @cambio="cargarTareas" />
           </TabPanel>
-          <slot name="paneles" />
+          <TabPanel v-if="rol !== 'ALUMNO'" value="reportes">
+            <ReportesPractica :practica="p" :puede-registrar="rol === 'OFERTADOR'" @cambio="emit('recargar')" />
+          </TabPanel>
         </TabPanels>
       </Tabs>
     </section>
