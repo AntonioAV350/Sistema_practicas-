@@ -38,6 +38,9 @@ useAuthStore().restoreSession();
 app.use(router);
 app.use(PrimeVue, {
   theme: { preset: SigeaPreset, options: { darkModeSelector: false } },
+  // PrimeVue 5 pide clave de licencia (la Community License es gratuita para
+  // estudiantes). Sin clave la app funciona, pero muestra un aviso en pantalla.
+  license: import.meta.env.VITE_PRIMEUI_LICENSE || undefined,
 });
 app.use(ToastService);
 app.use(ConfirmationService);

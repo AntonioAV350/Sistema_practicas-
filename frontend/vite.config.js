@@ -7,7 +7,7 @@ export default defineConfig({
     // El backend corre en :3000; con el proxy el navegador ve todo en el mismo
     // origen y no hace falta CORS.
     proxy: {
-      '/api': 'http://localhost:3000',
+      '/api': process.env.API_PROXY || 'http://localhost:3000',
     },
   },
 });

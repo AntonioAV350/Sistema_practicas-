@@ -82,7 +82,10 @@ watch(() => route.fullPath, () => (abierto.value = false));
 
     <div class="flex-1 min-w-0 flex flex-col">
       <header class="sticky top-0 z-20 h-16 bg-white border-b border-slate-200 flex items-center gap-3 px-4 lg:px-8">
-        <Button icon="pi pi-bars" text rounded class="lg:hidden" aria-label="Abrir menú" @click="abierto = true" />
+        <!-- el span lleva lg:hidden porque el display de PrimeVue le gana a la clase en el botón -->
+        <span class="lg:hidden">
+          <Button icon="pi pi-bars" text rounded aria-label="Abrir menú" @click="abierto = true" />
+        </span>
         <h1 class="text-lg font-semibold text-slate-800 truncate flex-1">{{ route.meta.titulo }}</h1>
         <CampanaNotificaciones :ruta="rutaNotificaciones" />
         <button
