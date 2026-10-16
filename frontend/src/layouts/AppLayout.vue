@@ -104,7 +104,8 @@ watch(() => route.fullPath, () => (abierto.value = false));
       </header>
 
       <main class="flex-1 p-4 lg:p-8">
-        <router-view />
+        <!-- key: vistas reutilizadas por varias rutas (prácticas/cierres) se vuelven a montar -->
+        <router-view :key="route.path" />
       </main>
     </div>
 

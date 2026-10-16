@@ -12,6 +12,8 @@ const v = {
   alumnos: () => import('../views/admin/AlumnosView.vue'),
   alumnoDetalle: () => import('../views/admin/AlumnoDetalleView.vue'),
   postulantes: () => import('../views/ofertador/PostulantesView.vue'),
+  practicas: () => import('../views/admin/PracticasView.vue'),
+  practicaDetalle: () => import('../views/comun/PracticaDetalleView.vue'),
 };
 
 // Vistas de administración que también usa el superadmin (tiene todo lo del admin)
@@ -26,6 +28,9 @@ function vistasAdmin() {
     },
     { path: 'vacantes', component: () => import('../views/admin/VacantesView.vue'), meta: { titulo: 'Vacantes' } },
     { path: 'vacantes/:id', component: v.postulantes, meta: { titulo: 'Detalle de la vacante' } },
+    { path: 'practicas', component: v.practicas, meta: { titulo: 'Prácticas' } },
+    { path: 'practicas/:id', component: v.practicaDetalle, meta: { titulo: 'Detalle de la práctica' } },
+    { path: 'cierres', component: v.practicas, meta: { titulo: 'Cierres', soloCierres: true, subroles: [ACA] } },
   ];
 }
 
@@ -47,6 +52,7 @@ const routes = [
         component: () => import('../views/alumno/PostulacionesView.vue'),
         meta: { titulo: 'Mis postulaciones' },
       },
+      { path: 'practica', component: () => import('../views/alumno/MiPracticaView.vue'), meta: { titulo: 'Mi práctica' } },
       { path: 'notificaciones', component: v.notificaciones, meta: { titulo: 'Notificaciones' } },
     ],
   },
@@ -58,6 +64,12 @@ const routes = [
       { path: '', component: v.inicio, meta: { titulo: 'Inicio' } },
       { path: 'vacantes', component: () => import('../views/ofertador/MisVacantesView.vue'), meta: { titulo: 'Mis vacantes' } },
       { path: 'vacantes/:id', component: v.postulantes, meta: { titulo: 'Postulantes' } },
+      {
+        path: 'practicantes',
+        component: () => import('../views/ofertador/PracticantesView.vue'),
+        meta: { titulo: 'Mis practicantes' },
+      },
+      { path: 'practicantes/:id', component: v.practicaDetalle, meta: { titulo: 'Practicante' } },
       { path: 'notificaciones', component: v.notificaciones, meta: { titulo: 'Notificaciones' } },
     ],
   },

@@ -45,6 +45,8 @@ function subirArchivo(carpeta, campo = 'archivo') {
       if (!req.file) return next(badRequest('Adjunta un archivo PDF, JPG o PNG'));
       // ruta relativa a uploads/, con '/' para que sea igual en Windows y Linux
       req.file.rutaRelativa = `${carpeta}/${req.file.filename}`;
+      // multer entrega el nombre en latin1; se recupera el UTF-8 original (acentos, ñ)
+      req.file.nombreOriginal = Buffer.from(req.file.originalname, 'latin1').toString('utf8');
       return next();
     });
 }
