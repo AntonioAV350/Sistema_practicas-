@@ -11,6 +11,7 @@ const v = {
   // admin
   alumnos: () => import('../views/admin/AlumnosView.vue'),
   alumnoDetalle: () => import('../views/admin/AlumnoDetalleView.vue'),
+  postulantes: () => import('../views/ofertador/PostulantesView.vue'),
 };
 
 // Vistas de administración que también usa el superadmin (tiene todo lo del admin)
@@ -23,6 +24,8 @@ function vistasAdmin() {
       component: () => import('../views/admin/CartasView.vue'),
       meta: { titulo: 'Cartas de presentación', subroles: [DOC] },
     },
+    { path: 'vacantes', component: () => import('../views/admin/VacantesView.vue'), meta: { titulo: 'Vacantes' } },
+    { path: 'vacantes/:id', component: v.postulantes, meta: { titulo: 'Detalle de la vacante' } },
   ];
 }
 
@@ -38,6 +41,12 @@ const routes = [
       { path: '', component: v.inicio, meta: { titulo: 'Inicio' } },
       { path: 'datos', component: () => import('../views/alumno/MisDatosView.vue'), meta: { titulo: 'Mis datos' } },
       { path: 'carta', component: () => import('../views/alumno/CartaView.vue'), meta: { titulo: 'Carta de presentación' } },
+      { path: 'vacantes', component: () => import('../views/alumno/VacantesView.vue'), meta: { titulo: 'Vacantes' } },
+      {
+        path: 'postulaciones',
+        component: () => import('../views/alumno/PostulacionesView.vue'),
+        meta: { titulo: 'Mis postulaciones' },
+      },
       { path: 'notificaciones', component: v.notificaciones, meta: { titulo: 'Notificaciones' } },
     ],
   },
@@ -47,6 +56,8 @@ const routes = [
     meta: { requiresAuth: true, roles: [OFERTADOR] },
     children: [
       { path: '', component: v.inicio, meta: { titulo: 'Inicio' } },
+      { path: 'vacantes', component: () => import('../views/ofertador/MisVacantesView.vue'), meta: { titulo: 'Mis vacantes' } },
+      { path: 'vacantes/:id', component: v.postulantes, meta: { titulo: 'Postulantes' } },
       { path: 'notificaciones', component: v.notificaciones, meta: { titulo: 'Notificaciones' } },
     ],
   },

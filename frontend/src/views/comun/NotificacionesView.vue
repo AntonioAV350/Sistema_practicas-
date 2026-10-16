@@ -40,6 +40,7 @@ function destino(n) {
     ofertador: {
       practica: n.idEntidad ? `/practicantes/${n.idEntidad}` : '/practicantes',
       aceptacion: '/vacantes',
+      vacante: n.idEntidad ? `/vacantes/${n.idEntidad}` : '/vacantes',
       baja: '/incidencias',
       incidencias: '/incidencias',
       incidencia: '/incidencias',
