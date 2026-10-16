@@ -6,8 +6,8 @@ const { ESTUDIANTE, OFERTADOR, ADMIN, SUPERADMIN } = ROLES;
 const { ADMIN_ACADEMICO: ACA, ADMIN_DOCUMENTAL: DOC } = SUBROLES;
 
 const v = {
-  inicio: () => import('../views/comun/InicioView.vue'),
   notificaciones: () => import('../views/comun/NotificacionesView.vue'),
+  inicioAdmin: () => import('../views/admin/InicioView.vue'),
   // admin
   alumnos: () => import('../views/admin/AlumnosView.vue'),
   alumnoDetalle: () => import('../views/admin/AlumnoDetalleView.vue'),
@@ -49,7 +49,7 @@ const routes = [
     component: () => import('../layouts/AlumnoLayout.vue'),
     meta: { requiresAuth: true, roles: [ESTUDIANTE] },
     children: [
-      { path: '', component: v.inicio, meta: { titulo: 'Inicio' } },
+      { path: '', component: () => import('../views/alumno/InicioView.vue'), meta: { titulo: 'Inicio' } },
       { path: 'datos', component: () => import('../views/alumno/MisDatosView.vue'), meta: { titulo: 'Mis datos' } },
       { path: 'carta', component: () => import('../views/alumno/CartaView.vue'), meta: { titulo: 'Carta de presentación' } },
       { path: 'vacantes', component: () => import('../views/alumno/VacantesView.vue'), meta: { titulo: 'Vacantes' } },
@@ -67,7 +67,7 @@ const routes = [
     component: () => import('../layouts/OfertadorLayout.vue'),
     meta: { requiresAuth: true, roles: [OFERTADOR] },
     children: [
-      { path: '', component: v.inicio, meta: { titulo: 'Inicio' } },
+      { path: '', component: () => import('../views/ofertador/InicioView.vue'), meta: { titulo: 'Inicio' } },
       { path: 'vacantes', component: () => import('../views/ofertador/MisVacantesView.vue'), meta: { titulo: 'Mis vacantes' } },
       { path: 'vacantes/:id', component: v.postulantes, meta: { titulo: 'Postulantes' } },
       {
@@ -89,7 +89,7 @@ const routes = [
     component: () => import('../layouts/AdminLayout.vue'),
     meta: { requiresAuth: true, roles: [ADMIN] },
     children: [
-      { path: '', component: v.inicio, meta: { titulo: 'Inicio' } },
+      { path: '', component: v.inicioAdmin, meta: { titulo: 'Inicio' } },
       ...vistasAdmin(),
       { path: 'notificaciones', component: v.notificaciones, meta: { titulo: 'Notificaciones' } },
     ],
@@ -99,7 +99,7 @@ const routes = [
     component: () => import('../layouts/SuperadminLayout.vue'),
     meta: { requiresAuth: true, roles: [SUPERADMIN] },
     children: [
-      { path: '', component: v.inicio, meta: { titulo: 'Inicio' } },
+      { path: '', component: v.inicioAdmin, meta: { titulo: 'Inicio' } },
       { path: 'cuentas', component: () => import('../views/superadmin/CuentasView.vue'), meta: { titulo: 'Cuentas' } },
       { path: 'empresas', component: () => import('../views/superadmin/EmpresasView.vue'), meta: { titulo: 'Empresas' } },
       ...vistasAdmin(),

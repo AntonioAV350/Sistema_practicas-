@@ -52,4 +52,32 @@ async function listar() {
   return rows;
 }
 
-module.exports = { perfilPorUsuario, crear, actualizar, listar };
+// Pendientes del ofertador para su tablero
+async function resumen(idUsuario) {
+  const { rows } = await pool.query(
+    `WITH mias AS (
+       SELECT v.id_vacante, v.estado FROM practicas.vacantes v
+         JOIN practicas.ofertadores o ON o.id_ofertador = v.id_ofertador
+        WHERE o.id_usuario = $1),
+     practicas_mias AS (
+       SELECT pa.id_practica, pa.estado FROM practicas.practica_alumno pa
+        WHERE pa.id_vacante IN (SELECT id_vacante FROM mias))
+     SELECT
+       (SELECT count(*) FROM mias WHERE estado = 'ABIERTA') AS vacantes_abiertas,
+       (SELECT count(*) FROM practicas.postulaciones p
+         WHERE p.id_vacante IN (SELECT id_vacante FROM mias) AND p.estado = 'POSTULADA') AS postulaciones_nuevas,
+       (SELECT count(*) FROM practicas.aceptaciones a
+          JOIN practicas.postulaciones p ON p.id_postulacion = a.id_postulacion
+         WHERE p.id_vacante IN (SELECT id_vacante FROM mias) AND a.estado = 'PENDIENTE') AS aceptaciones_pendientes,
+       (SELECT count(*) FROM practicas_mias WHERE estado IN ('ACTIVA', 'EN_REVISION_CIERRE')) AS practicantes_activos,
+       (SELECT count(*) FROM practicas.tareas t
+         WHERE t.id_practica IN (SELECT id_practica FROM practicas_mias) AND t.estado = 'ENTREGADA') AS tareas_por_revisar,
+       (SELECT count(*) FROM practicas.v_avance_practica av
+         WHERE av.id_practica IN (SELECT id_practica FROM practicas_mias)
+           AND av.estado = 'ACTIVA' AND av.dias_sin_registro >= 3) AS practicantes_sin_bitacora`,
+    [idUsuario],
+  );
+  return rows[0];
+}
+
+module.exports = { perfilPorUsuario, crear, actualizar, listar, resumen };

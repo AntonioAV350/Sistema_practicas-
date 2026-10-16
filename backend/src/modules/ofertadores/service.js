@@ -23,4 +23,9 @@ async function actualizarMiPerfil(idUsuario, datos) {
 
 const listar = () => repository.listar();
 
-module.exports = { perfilDeUsuario, miPerfil, actualizarMiPerfil, listar };
+async function resumen(idUsuario) {
+  await perfilDeUsuario(idUsuario);
+  return repository.resumen(idUsuario);
+}
+
+module.exports = { perfilDeUsuario, miPerfil, actualizarMiPerfil, listar, resumen };
