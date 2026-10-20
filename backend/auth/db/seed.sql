@@ -146,27 +146,35 @@ ON CONFLICT (id_usuario, id_rol) DO NOTHING;
 -- ============================================================
 -- CATÁLOGOS ACADÉMICOS Y PERFILES DE PRUEBA (SOLO DESARROLLO)
 -- ============================================================
+-- Hay carreras semestrales y cuatrimestrales: cada carrera apunta a su tipo de
+-- periodo y cada tipo tiene sus propios ciclos (los de un tipo no se traslapan).
 INSERT INTO core.tipos_periodo (clave, nombre, periodos_por_anio) VALUES
-    ('SEMESTRE', 'Semestre', 2)
+    ('SEMESTRE', 'Semestre', 2),
+    ('CUATRIMESTRE', 'Cuatrimestre', 3)
 ON CONFLICT (clave) DO UPDATE
 SET nombre = EXCLUDED.nombre, periodos_por_anio = EXCLUDED.periodos_por_anio;
 
 INSERT INTO core.carreras (nombre_carrera, id_tipo_periodo, total_periodos, periodo_minimo_practicas)
 SELECT c.nombre, tp.id_tipo_periodo, c.total, c.minimo
 FROM (VALUES
-    ('Ingeniería en Sistemas Computacionales', 9, 6),
-    ('Licenciatura en Administración', 8, 6)
-) AS c(nombre, total, minimo)
-JOIN core.tipos_periodo tp ON tp.clave = 'SEMESTRE'
+    ('Ingeniería en Sistemas Computacionales', 'SEMESTRE', 9, 6),
+    ('Licenciatura en Administración', 'SEMESTRE', 8, 6),
+    ('Ingeniería en Tecnologías de la Información', 'CUATRIMESTRE', 10, 7),
+    ('Licenciatura en Gestión Empresarial', 'CUATRIMESTRE', 10, 7)
+) AS c(nombre, tipo, total, minimo)
+JOIN core.tipos_periodo tp ON tp.clave = c.tipo
 ON CONFLICT (nombre_carrera) DO NOTHING;
 
 INSERT INTO core.ciclos_escolares (id_tipo_periodo, clave, fecha_inicio, fecha_fin)
 SELECT tp.id_tipo_periodo, c.clave, c.inicio::date, c.fin::date
 FROM (VALUES
-    ('2026-2', '2026-08-01', '2026-12-31'),
-    ('2027-1', '2027-01-15', '2027-06-30')
-) AS c(clave, inicio, fin)
-JOIN core.tipos_periodo tp ON tp.clave = 'SEMESTRE'
+    ('SEMESTRE', '2026-2', '2026-08-01', '2026-12-31'),
+    ('SEMESTRE', '2027-1', '2027-01-15', '2027-06-30'),
+    ('CUATRIMESTRE', '2026-C3', '2026-09-01', '2026-12-18'),
+    ('CUATRIMESTRE', '2027-C1', '2027-01-06', '2027-04-23'),
+    ('CUATRIMESTRE', '2027-C2', '2027-05-03', '2027-08-20')
+) AS c(tipo, clave, inicio, fin)
+JOIN core.tipos_periodo tp ON tp.clave = c.tipo
 ON CONFLICT (id_tipo_periodo, clave) DO NOTHING;
 
 INSERT INTO core.alumnos (id_usuario, matricula, id_carrera, grupo)

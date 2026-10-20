@@ -84,16 +84,16 @@ onMounted(async () => {
       <label class="campo">Matrícula <InputText v-model="form.matricula" /></label>
       <label class="campo">
         Carrera
-        <Select v-model="form.idCarrera" :options="carreras" option-label="nombreCarrera" option-value="idCarrera" />
+        <Select v-model="form.idCarrera" :options="carreras" :option-label="(c) => `${c.nombreCarrera} (${c.nombreTipoPeriodo.toLowerCase()})`" option-value="idCarrera" @change="form.numeroPeriodo = null" />
       </label>
       <label class="campo">
-        Periodo que cursas <span class="text-slate-400 font-normal">(ciclo {{ perfil.cicloActual || 'sin ciclo vigente' }})</span>
+        {{ carrera ? `${carrera.nombreTipoPeriodo} que cursas` : 'Periodo que cursas' }} <span class="text-slate-400 font-normal">(ciclo {{ perfil.cicloActual || 'sin ciclo vigente' }})</span>
         <Select v-model="form.numeroPeriodo" :options="periodos" option-label="label" option-value="value" placeholder="Elige" />
       </label>
       <label class="campo">Grupo <InputText v-model="form.grupo" /></label>
 
       <p class="sm:col-span-2 text-xs text-slate-500">
-        Puedes iniciar prácticas desde el periodo {{ carrera?.periodoMinimoPracticas ?? '—' }}. La matrícula y la carrera
+        Puedes iniciar prácticas desde el {{ carrera?.periodoMinimoPracticas ?? '—' }}° {{ carrera?.nombreTipoPeriodo.toLowerCase() ?? 'periodo' }}. La matrícula y la carrera
         ya no se pueden cambiar después de generar tu primera carta.
       </p>
 

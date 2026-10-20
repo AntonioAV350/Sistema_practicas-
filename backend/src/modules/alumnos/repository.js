@@ -5,12 +5,14 @@ const pool = require('../../config/db');
 const PERFIL = `
   SELECT a.id_alumno, a.matricula, a.grupo, a.id_carrera,
          c.nombre_carrera, c.total_periodos, c.periodo_minimo_practicas,
+         lower(tp.nombre) AS tipo_periodo,
          u.id_usuario, u.username, u.nombre, u.apellido_paterno, u.apellido_materno,
          u.email, u.telefono, u.activo,
          ce.id_ciclo, ce.clave AS ciclo_actual, ins.numero_periodo
     FROM core.alumnos a
     JOIN core.usuarios u ON u.id_usuario = a.id_usuario
     JOIN core.carreras c ON c.id_carrera = a.id_carrera
+    JOIN core.tipos_periodo tp ON tp.id_tipo_periodo = c.id_tipo_periodo
     LEFT JOIN core.ciclos_escolares ce
            ON ce.id_tipo_periodo = c.id_tipo_periodo
           AND current_date BETWEEN ce.fecha_inicio AND ce.fecha_fin
@@ -92,12 +94,13 @@ async function listar({ q, idCarrera }) {
   const { rows } = await pool.query(
     `SELECT a.id_alumno, a.matricula, a.grupo, c.nombre_carrera,
             u.id_usuario, u.nombre, u.apellido_paterno, u.apellido_materno, u.email, u.activo,
-            ins.numero_periodo,
+            ins.numero_periodo, lower(tp.nombre) AS tipo_periodo,
             carta.estado AS estado_carta,
             pr.id_practica, pr.estado AS estado_practica
        FROM core.alumnos a
        JOIN core.usuarios u ON u.id_usuario = a.id_usuario
        JOIN core.carreras c ON c.id_carrera = a.id_carrera
+       JOIN core.tipos_periodo tp ON tp.id_tipo_periodo = c.id_tipo_periodo
        LEFT JOIN core.ciclos_escolares ce
               ON ce.id_tipo_periodo = c.id_tipo_periodo AND current_date BETWEEN ce.fecha_inicio AND ce.fecha_fin
        LEFT JOIN core.alumno_inscripciones ins ON ins.id_alumno = a.id_alumno AND ins.id_ciclo = ce.id_ciclo

@@ -37,7 +37,7 @@ onMounted(async () => {
           <div><dt class="text-slate-500">Teléfono</dt><dd>{{ alumno.telefono || '—' }}</dd></div>
           <div>
             <dt class="text-slate-500">Periodo / grupo</dt>
-            <dd>{{ alumno.numeroPeriodo ? `${alumno.numeroPeriodo}°` : 'Sin inscripción vigente' }} · {{ alumno.grupo }}</dd>
+            <dd>{{ alumno.numeroPeriodo ? `${alumno.numeroPeriodo}° ${alumno.tipoPeriodo}` : 'Sin inscripción vigente' }} · {{ alumno.grupo }}</dd>
           </div>
           <div><dt class="text-slate-500">Ciclo</dt><dd>{{ alumno.cicloActual || '—' }}</dd></div>
         </dl>

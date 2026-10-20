@@ -31,10 +31,10 @@ async function generar(idUsuario) {
       throw conflict(motivo, 'CARTA_EN_CURSO');
     }
     if (!p.numero_periodo) {
-      throw conflict('Registra en "Mis datos" el periodo que cursas en el ciclo actual antes de generar tu carta');
+      throw conflict(`Registra en "Mis datos" el ${p.tipo_periodo} que cursas en el ciclo actual antes de generar tu carta`);
     }
     if (p.numero_periodo < p.periodo_minimo_practicas) {
-      throw conflict(`Puedes solicitar tu carta a partir del periodo ${p.periodo_minimo_practicas}`);
+      throw conflict(`Puedes solicitar tu carta a partir del ${p.periodo_minimo_practicas}° ${p.tipo_periodo}`);
     }
 
     // Foto de los datos al momento de generarla
@@ -43,6 +43,7 @@ async function generar(idUsuario) {
       matricula: p.matricula,
       carrera: p.nombre_carrera,
       periodo: p.numero_periodo,
+      tipoPeriodo: p.tipo_periodo,
       grupo: p.grupo,
       ciclo: p.ciclo_actual,
       email: p.email,
@@ -72,7 +73,7 @@ async function pdf(idCarta, user) {
     destinatario: ['A QUIEN CORRESPONDA', 'P R E S E N T E'],
     parrafos: [
       `Por medio de la presente, la ${INSTITUCION} presenta a ${d.nombreCompleto}, con matrícula ${d.matricula}, ` +
-        `alumno(a) del ${d.periodo}° periodo, grupo ${d.grupo}, de la carrera de ${d.carrera}` +
+        `alumno(a) del ${d.periodo}° ${d.tipoPeriodo || 'periodo'}, grupo ${d.grupo}, de la carrera de ${d.carrera}` +
         `${d.ciclo ? `, inscrito(a) en el ciclo escolar ${d.ciclo}` : ''}.`,
       'El (la) alumno(a) cumple con los requisitos académicos para realizar sus prácticas profesionales, ' +
         'por lo que solicitamos atentamente su apoyo para que pueda llevarlas a cabo en su organización, ' +

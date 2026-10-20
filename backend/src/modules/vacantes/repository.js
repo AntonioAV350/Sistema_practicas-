@@ -159,7 +159,7 @@ async function postulantesDeVacante(idVacante) {
     `SELECT p.id_postulacion, p.postulada_en, p.estado,
             al.id_alumno, al.matricula, al.grupo, c.nombre_carrera,
             u.nombre, u.apellido_paterno, u.apellido_materno, u.email, u.telefono,
-            ins.numero_periodo,
+            ins.numero_periodo, lower(tp.nombre) AS tipo_periodo,
             ca.id_carta AS id_carta_aprobada,
             a.id_aceptacion, a.estado AS estado_aceptacion, a.expira_en,
             pa.id_practica
@@ -167,6 +167,7 @@ async function postulantesDeVacante(idVacante) {
        JOIN core.alumnos al ON al.id_alumno = p.id_alumno
        JOIN core.usuarios u ON u.id_usuario = al.id_usuario
        JOIN core.carreras c ON c.id_carrera = al.id_carrera
+       JOIN core.tipos_periodo tp ON tp.id_tipo_periodo = c.id_tipo_periodo
        LEFT JOIN core.ciclos_escolares ce
               ON ce.id_tipo_periodo = c.id_tipo_periodo AND current_date BETWEEN ce.fecha_inicio AND ce.fecha_fin
        LEFT JOIN core.alumno_inscripciones ins ON ins.id_alumno = al.id_alumno AND ins.id_ciclo = ce.id_ciclo

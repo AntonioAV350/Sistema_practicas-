@@ -84,7 +84,7 @@ onMounted(async () => {
       <Column header="Carrera">
         <template #body="{ data }">
           {{ data.nombreCarrera }}
-          <span class="text-xs text-slate-500">· {{ data.numeroPeriodo ? `${data.numeroPeriodo}° ` : '' }}{{ data.grupo }}</span>
+          <span class="text-xs text-slate-500">· {{ data.numeroPeriodo ? `${data.numeroPeriodo}° ${data.tipoPeriodo} · ` : '' }}{{ data.grupo }}</span>
         </template>
       </Column>
       <Column header="Carta">

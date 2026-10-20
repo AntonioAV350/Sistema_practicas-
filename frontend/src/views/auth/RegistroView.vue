@@ -121,7 +121,7 @@ onMounted(async () => {
           <Select
             v-model="form.idCarrera"
             :options="carreras"
-            option-label="nombreCarrera"
+            :option-label="(c) => `${c.nombreCarrera} (${c.nombreTipoPeriodo.toLowerCase()})`"
             option-value="idCarrera"
             placeholder="Elige tu carrera"
             :invalid="!!errores.idCarrera"
@@ -130,7 +130,7 @@ onMounted(async () => {
           <small v-if="errores.idCarrera">{{ errores.idCarrera }}</small>
         </label>
         <label class="campo">
-          Periodo que cursas
+          {{ carrera ? `${carrera.nombreTipoPeriodo} que cursas` : 'Periodo que cursas' }}
           <Select
             v-model="form.numeroPeriodo"
             :options="periodos"

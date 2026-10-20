@@ -29,10 +29,10 @@ function validarCierre(cierraEn) {
 // Requisito académico que la BD no valida: periodo mínimo de la carrera en el ciclo vigente
 function validarPeriodo(perfil) {
   if (!perfil.numero_periodo) {
-    throw conflict('Registra en "Mis datos" el periodo que cursas en el ciclo actual');
+    throw conflict(`Registra en "Mis datos" el ${perfil.tipo_periodo} que cursas en el ciclo actual`);
   }
   if (perfil.numero_periodo < perfil.periodo_minimo_practicas) {
-    throw conflict(`Puedes postularte a partir del periodo ${perfil.periodo_minimo_practicas} de tu carrera`);
+    throw conflict(`Puedes postularte a partir del ${perfil.periodo_minimo_practicas}° ${perfil.tipo_periodo} de tu carrera`);
   }
 }
 
@@ -112,9 +112,9 @@ async function elegibilidad(idUsuario) {
   let motivo = null;
   if (r.practica_viva) motivo = 'Ya tienes una práctica en curso.';
   else if (!r.carta_aprobada) motivo = 'Necesitas tu carta de presentación aprobada para postularte.';
-  else if (!perfil.numero_periodo) motivo = 'Registra en "Mis datos" el periodo que cursas en el ciclo actual.';
+  else if (!perfil.numero_periodo) motivo = `Registra en "Mis datos" el ${perfil.tipo_periodo} que cursas en el ciclo actual.`;
   else if (perfil.numero_periodo < perfil.periodo_minimo_practicas) {
-    motivo = `Puedes postularte a partir del periodo ${perfil.periodo_minimo_practicas}.`;
+    motivo = `Puedes postularte a partir del ${perfil.periodo_minimo_practicas}° ${perfil.tipo_periodo}.`;
   }
   return { puede: !motivo, motivo, cartaAprobada: r.carta_aprobada, practicaViva: r.practica_viva };
 }

@@ -80,7 +80,7 @@ onMounted(cargar);
           <template #body="{ data }">
             {{ data.nombreCarrera }}
             <div class="text-xs text-slate-500">
-              {{ data.matricula }} · {{ data.numeroPeriodo ? `${data.numeroPeriodo}°` : '' }} {{ data.grupo }}
+              {{ data.matricula }} · {{ data.numeroPeriodo ? `${data.numeroPeriodo}° ${data.tipoPeriodo}` : '' }} {{ data.grupo }}
             </div>
           </template>
         </Column>
