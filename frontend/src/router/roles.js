@@ -1,10 +1,6 @@
-// PENDIENTE: mover ROLES a shared/constants cuando el equipo lo defina.
-export const ROLES = {
-  ESTUDIANTE: 'ESTUDIANTE',
-  OFERTADOR: 'OFERTADOR',
-  ADMIN: 'ADMIN',
-  SUPERADMIN: 'SUPERADMIN',
-};
+import { ROLES, SUBROLES } from 'shared/constants';
+
+export { ROLES, SUBROLES };
 
 export const RUTA_POR_ROL = {
   [ROLES.SUPERADMIN]: '/superadmin',

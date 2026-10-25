@@ -1,5 +1,9 @@
 {
   "name": "shared",
   "version": "1.0.0",
-  "private": true
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./constants": "./constants/index.js"
+  }
 }

@@ -37,4 +37,28 @@ async function refresh(req, res, next) {
   }
 }
 
-module.exports = { login, refresh };
+// POST /api/auth/registro (body ya validado por registroSchema)
+async function registro(req, res) {
+  res.status(201).json(await service.registro(req.body));
+}
+
+// GET /api/auth/me
+async function me(req, res, next) {
+  try {
+    return res.json(await service.me(req.user.id));
+  } catch (err) {
+    return handleAuthError(err, res, next);
+  }
+}
+
+// PATCH /api/auth/password
+async function cambiarPassword(req, res, next) {
+  try {
+    await service.cambiarPassword(req.user.id, req.body.actual, req.body.nueva);
+    return res.status(204).end();
+  } catch (err) {
+    return handleAuthError(err, res, next);
+  }
+}
+
+module.exports = { login, refresh, registro, me, cambiarPassword };
