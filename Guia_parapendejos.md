@@ -39,8 +39,6 @@ git switch main
 git pull
 ```
 
-> Mientras el PR #6 (el MVP completo) no se mergee a `main`, el código nuevo vive en la rama `feature/SIGEA-21-dashboards-docs`. Para probarlo antes del merge: `git switch feature/SIGEA-21-dashboards-docs` y luego `git pull`.
-
 Instala las dependencias de los 3 workspaces (frontend, backend y shared) con un solo comando:
 
 ```powershell
