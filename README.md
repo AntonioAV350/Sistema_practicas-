@@ -69,3 +69,4 @@ Estas cuentas son solo para desarrollo: no corras el seed en producción.
 - `backend/auth/db/`: migraciones, seed y runner.
 - `backend/uploads/`: archivos subidos. No se versiona y solo se sirve por endpoints con control de acceso.
 - `docs/`: [matriz de permisos](docs/matriz-permisos.md) y [pruebas manuales](docs/pruebas-manuales.md).
+- [Guia_parapendejos.md](Guia_parapendejos.md): paso a paso para levantar y probar el sistema.
